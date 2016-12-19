@@ -12,7 +12,8 @@ public func encode(claims: ClaimSet, algorithm: Algorithm) -> String {
     return nil
   }
 
-  let header = encodeJSON(["typ": "JWT", "alg": algorithm.description])!
+  //let header = encodeJSON(["typ": "JWT", "alg": algorithm.description])!
+  let header = encodeJSON(["alg": algorithm.description])!
   let payload = encodeJSON(claims.claims)!
   let signingInput = "\(header).\(payload)"
   let signature = algorithm.sign(signingInput)
