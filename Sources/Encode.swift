@@ -1,9 +1,11 @@
+import Foundation
+
 /*** Encode a set of claims
  - parameter claims: The set of claims
  - parameter algorithm: The algorithm to sign the payload with
  - returns: The JSON web token as a String
  */
-public func encode(claims: ClaimSet, algorithm: Algorithm) -> String {
+public func encode(claims: ClaimSet, algorithm: Algorithm, headers: [String: String]? = nil) -> String {
   func encodeJSON(_ payload: [String: Any]) -> String? {
     if let data = try? JSONSerialization.data(withJSONObject: payload) {
       return base64encode(data)
@@ -12,8 +14,13 @@ public func encode(claims: ClaimSet, algorithm: Algorithm) -> String {
     return nil
   }
 
-  //let header = encodeJSON(["typ": "JWT", "alg": algorithm.description])!
-  let header = encodeJSON(["alg": algorithm.description])!
+  var headers = headers ?? [:]
+  if !headers.keys.contains("typ") {
+    headers["typ"] = "JWT"
+  }
+  headers["alg"] = algorithm.description
+
+  let header = encodeJSON(headers)!
   let payload = encodeJSON(claims.claims)!
   let signingInput = "\(header).\(payload)"
   let signature = algorithm.sign(signingInput)
@@ -25,8 +32,8 @@ public func encode(claims: ClaimSet, algorithm: Algorithm) -> String {
  - parameter algorithm: The algorithm to sign the payload with
  - returns: The JSON web token as a String
  */
-public func encode(claims: [String: Any], algorithm: Algorithm) -> String {
-  return encode(claims: ClaimSet(claims: claims), algorithm: algorithm)
+public func encode(claims: [String: Any], algorithm: Algorithm, headers: [String: String]? = nil) -> String {
+  return encode(claims: ClaimSet(claims: claims), algorithm: algorithm, headers: headers)
 }
 
 
