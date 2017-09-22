@@ -14,7 +14,7 @@ public struct ClaimSet {
 
     set {
       if let newValue = newValue, let date = newValue as? Date {
-        claims[key] = Int(date.timeIntervalSince1970)
+        claims[key] = Int(date.timeIntervalSince1970) // Jens: convert to Int
       } else {
         claims[key] = newValue
       }

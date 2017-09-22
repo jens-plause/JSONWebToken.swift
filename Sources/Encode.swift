@@ -16,7 +16,7 @@ public func encode(claims: ClaimSet, algorithm: Algorithm, headers: [String: Str
 
   var headers = headers ?? [:]
   if !headers.keys.contains("typ") {
-    headers["typ"] = "JWT"
+//    headers["typ"] = "JWT" // Jens: removed this
   }
   headers["alg"] = algorithm.description
 
