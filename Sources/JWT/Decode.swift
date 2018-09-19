@@ -88,30 +88,15 @@ func load(_ jwt: String) throws -> (header: JOSEHeader, payload: ClaimSet, signa
   let signatureSegment = segments[2]
   let signatureInput = "\(headerSegment).\(payloadSegment)"
 
-  guard let headerData = base64decode(headerSegment) else {
-    throw InvalidToken.decodeError("Header is not correctly encoded as base64")
-  }
-
-  let header = (try? JSONSerialization.jsonObject(with: headerData, options: JSONSerialization.ReadingOptions(rawValue: 0))) as? Payload
-  if header == nil {
-    throw InvalidToken.decodeError("Invalid header")
-  }
-
-  let payloadData = base64decode(payloadSegment)
-  if payloadData == nil {
-    throw InvalidToken.decodeError("Payload is not correctly encoded as base64")
-  }
-
-  let payload = (try? JSONSerialization.jsonObject(with: payloadData!, options: JSONSerialization.ReadingOptions(rawValue: 0))) as? Payload
-  if payload == nil {
-    throw InvalidToken.decodeError("Invalid payload")
-  }
+  let decoder = CompactJSONDecoder()
+  let header = try decoder.decode(JOSEHeader.self, from: headerSegment)
+  let payload = try decoder.decode(from: payloadSegment)
 
   guard let signature = base64decode(signatureSegment) else {
     throw InvalidToken.decodeError("Signature is not correctly encoded as base64")
   }
 
-  return (header: JOSEHeader(parameters: header!), payload: ClaimSet(claims: payload!), signature: signature, signatureInput: signatureInput)
+  return (header: header, payload: ClaimSet(claims: payload), signature: signature, signatureInput: signatureInput)
 }
 
 // MARK: Signature Verification
@@ -123,7 +108,7 @@ func verifySignature(_ algorithms: [Algorithm], header: JOSEHeader, signingInput
 
   let verifiedAlgorithms = algorithms
     .filter { algorithm in algorithm.description == alg }
-    .filter { algorithm in algorithm.verify(signingInput, signature: signature) }
+    .filter { algorithm in algorithm.algorithm.verify(signingInput.data(using: .utf8)!, signature: signature) }
 
   if verifiedAlgorithms.isEmpty {
     throw InvalidToken.invalidAlgorithm

@@ -1,18 +1,13 @@
 import Foundation
 
+
 /*** Encode a set of claims
  - parameter claims: The set of claims
  - parameter algorithm: The algorithm to sign the payload with
  - returns: The JSON web token as a String
  */
 public func encode(claims: ClaimSet, algorithm: Algorithm, headers: [String: String]? = nil) -> String {
-  func encodeJSON(_ payload: [String: Any]) -> String? {
-    if let data = try? JSONSerialization.data(withJSONObject: payload) {
-      return base64encode(data)
-    }
-
-    return nil
-  }
+  let encoder = CompactJSONEncoder()
 
   var headers = headers ?? [:]
   if !headers.keys.contains("typ") {
@@ -20,10 +15,10 @@ public func encode(claims: ClaimSet, algorithm: Algorithm, headers: [String: Str
   }
   headers["alg"] = algorithm.description
 
-  let header = encodeJSON(headers)!
-  let payload = encodeJSON(claims.claims)!
+  let header = try! encoder.encodeString(headers)
+  let payload = encoder.encodeString(claims.claims)!
   let signingInput = "\(header).\(payload)"
-  let signature = algorithm.sign(signingInput)
+  let signature = base64encode(algorithm.algorithm.sign(signingInput.data(using: .utf8)!))
   return "\(signingInput).\(signature)"
 }
 
