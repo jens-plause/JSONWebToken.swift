@@ -1,5 +1,5 @@
 import Foundation
-import JWA
+//import JWA // jens: commented this to make cocoapods work again
 
 
 /// Represents a JSON Web Algorithm (JWA)

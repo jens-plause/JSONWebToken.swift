@@ -6,23 +6,14 @@ Pod::Spec.new do |spec|
   spec.license = { :type => 'BSD', :file => 'LICENSE' }
   spec.author = { 'Kyle Fuller' => 'kyle@fuller.li' }
   spec.source = { :git => 'https://github.com/kylef/JSONWebToken.swift.git', :tag => "#{spec.version}" }
+  spec.source_files = 'Sources/JWT/**/*.swift'
   spec.ios.deployment_target = '8.0'
   spec.osx.deployment_target = '10.9'
   spec.tvos.deployment_target = '9.0'
   spec.watchos.deployment_target = '2.0'
   spec.requires_arc = true
-
-  spec.subspec 'JWA' do |jwa|
-    jwa.source_files = 'Sources/JWA/**/*.swift'
-    jwa.exclude_files = ['Sources/JWA/HMAC/HMACCryptoSwift.swift']
-    jwa.module_name = 'JWA'
-  end
-
-  spec.subspec 'JWT' do |jwt|
-    jwt.source_files = 'Sources/JWT/**/*.swift'
-    jwt.module_name = 'JWA'
-  end
-
+  spec.module_name = 'JWT'
+  spec.exclude_files = ['Sources/JWA/HMAC/HMACCryptoSwift.swift']
 
   if ARGV.include?('lint')
     spec.pod_target_xcconfig = {
