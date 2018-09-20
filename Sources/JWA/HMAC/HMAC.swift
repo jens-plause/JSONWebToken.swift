@@ -1,7 +1,7 @@
 import Foundation
 
 
-final public class HMACAlgorithm: Algorithm {
+final public class HMACAlgorithm: JWAAlgorithm {
   public let key: Data
   public let hash: Hash
 
